@@ -96,6 +96,16 @@ userSchema.pre("save", function (next) {
    * Listing 23.4 (p. 340)
    * user.js에서의 pre 훅 해싱
    */
+  bcrypt
+    .hash(user.password,10)
+    .then(hashPw => {
+      user.password = hashPw;
+      next();
+    })
+    .catch(error => {
+      console.log(`Error hashing pw: ${error.message}`);
+      next(error);
+    });
 });
 
 userSchema.pre("save", function (next) {
@@ -128,6 +138,10 @@ userSchema.pre("save", function (next) {
  * Listing 23.4 (p. 340)
  * user.js에서의 pre 훅 해싱
  */
+userSchema.methods.passwordCompare = (inPw) => {
+  let user = this;
+  return bcrypt.compare(inPw,user.password);
+}
 
 module.exports = mongoose.model("User", userSchema);
 
